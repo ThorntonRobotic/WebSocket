@@ -1,0 +1,65 @@
+<head> 
+  <script type='text/javascript' src='https://webrtc.github.io/adapter/adapter-latest.js'></script> 
+  <script type='text/javascript'> 
+    var connections = {}; 
+    var reportError; 
+
+    function onServerMessage(event) {  
+      var msg;  
+      var url = event.srcElement.url;  
+
+  //    try {  
+  //      msg = JSON.parse(event.data);  
+  //    } catch (e) {  
+  //      return;  
+  //    }  
+      console.log('onMessage (%%s)\\n', event.data);  
+ //       switch (msg.type) {  
+ //       case 'sdp': onIncomingSDP(url, msg.data); break;  
+ //       case 'ice': onIncomingICE(url, msg.data); break;  
+ //       default: break;  
+ //     }  
+    }  
+
+    function  onServerOpened(event){
+      var url = event.srcElement.url;
+      connections[url].websocket.send("Hello Server!");
+    }
+    
+
+    function loopback( hostname, port, path, reportErrorCB) {  
+      var l = window.location; 
+      if( path == 'null' )  
+      return;  
+      var wsProt = (l.protocol == 'https:') ? 'wss://' : 'ws://';  
+      var wsHost = (hostname != undefined) ? hostname : l.hostname;  
+      var wsPort = (port != undefined) ? port : l.port;  
+      var wsPath = (path != undefined) ? path : '/ws';  
+      if (wsPort) 
+        wsPort = ':' + wsPort; 
+      var wsUrl = wsProt + wsHost + wsPort + wsPath;  
+      console.log('Websocket URL: ' + wsUrl);  
+      var url = wsUrl;  
+
+      connections[url] = {};  
+
+      connections[url].type = 'inbound';  
+      reportError = (reportErrorCB != undefined) ? reportErrorCB : function(text) {};  
+
+      connections[url].websocket = new WebSocket(wsUrl);  
+      connections[url].websocket.addEventListener('message', onServerMessage); 
+      connections[url].websocket.addEventListener('open', onServerOpened); 
+    }  
+
+    window.onload = function() {  
+      var config = { 'iceServers': [{ 'urls': 'stun:stun1.l.google.com:19302' }] }; 
+      loopback( '192.168.86.37', 9002, '/ws', function (errmsg) { console.error(errmsg); });  
+  };  
+
+  </script>  
+</head>  
+
+<body style='background-color:#333333; color:#FFFFFF;'>  
+  <pre>'Web Socket'</pre>  
+</body>  
+</html> 
