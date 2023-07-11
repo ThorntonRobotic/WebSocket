@@ -43,8 +43,7 @@ global_config()
 
 include_directories(${PROJECT_NAME}
   #../WebRTC_R32.7.3/webrtc_headers
-  ./asio/include
-  ./abseil-cpp
+  ./asio/asio/include
   ./websocketpp
 )
 
