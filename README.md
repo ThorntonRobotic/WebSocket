@@ -8,3 +8,6 @@ https://github.com/zaphoyd/websocketpp/
 git submodule add https://github.com/zaphoyd/websocketpp/
 git submodule add https://github.com/chriskohlhoff/asio/
 
+-- To populate submodules
+git submodule update
+git submodule init
