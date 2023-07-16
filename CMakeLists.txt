@@ -17,6 +17,8 @@ macro(global_config)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -g -Wall -std=c++17 -fPIC")
   endif()
 
+  # Ugly but ok for now
+  link_directories(${CMAKE_SOURCE_DIR}/build/jsoncpp/src/lib_json)
 
  # find_package(CUDA QUIET REQUIRED)
  # include_directories(${CUDA_INCLUDE_DIRS})
@@ -24,9 +26,9 @@ macro(global_config)
   #link_directories(${CMAKE_SOURCE_DIR}/../WebRTC_R32.7.3)
   # MAC set(GLOBAL_LIBRARIES  ${CUDA_LIBRARIES}  dl pthread)
   if (WIN32)
-    set(GLOBAL_LIBRARIES pthread ws2_32 mswsock)
+    set(GLOBAL_LIBRARIES pthread ws2_32 mswsock jsoncpp)
   else()
-    set(GLOBAL_LIBRARIES  pthread dl)
+    set(GLOBAL_LIBRARIES  pthread dl jsoncpp)
   endif (WIN32)
   
 
@@ -45,28 +47,30 @@ include_directories(${PROJECT_NAME}
   #../WebRTC_R32.7.3/webrtc_headers
   ./asio/asio/include
   ./websocketpp
+  ./jsoncpp/include
 )
 
-add_executable(wsServerCallback wsServerCallback.cpp)
-set_property(TARGET wsServerCallback PROPERTY CXX_STANDARD 17)
-target_link_libraries(wsServerCallback ${GLOBAL_LIBRARIES})
-set_target_properties(wsServerCallback PROPERTIES
-RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_SOURCE_DIR}/bin/debug
-RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_SOURCE_DIR}/bin/release)
+set(JSONCPP_WITH_TESTS  OFF)
+set(BUILD_SHARED_LIBS OFF)
+set(BUILD_STATIC_LIBS ON)
+set(BUILD_OBJECT_LIBS OFF)
 
-add_executable(wsServerClass wsServerClass.cpp)
-set_property(TARGET wsServerClass PROPERTY CXX_STANDARD 17)
-target_link_libraries(wsServerClass ${GLOBAL_LIBRARIES})
-set_target_properties(wsServerClass PROPERTIES
-RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_SOURCE_DIR}/bin/debug
-RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_SOURCE_DIR}/bin/release)
+add_subdirectory(jsoncpp)
 
-add_executable(wsClientClass wsClientClass.cpp)
-set_property(TARGET wsClientClass PROPERTY CXX_STANDARD 17)
-target_link_libraries(wsClientClass ${GLOBAL_LIBRARIES})
-set_target_properties(wsClientClass PROPERTIES
-RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_SOURCE_DIR}/bin/debug
-RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_SOURCE_DIR}/bin/release)
+foreach(s
+    wsServerCallback
+    wsServerClass
+    wsClientClass
+    wsJsonClient
+    wsJsonServer
+    )
+  add_executable(${s} ${s}.cpp)
+  set_property(TARGET ${s} PROPERTY CXX_STANDARD 17)
+  target_link_libraries(${s} ${GLOBAL_LIBRARIES})
+  set_target_properties(${s} PROPERTIES
+  RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_SOURCE_DIR}/bin/debug
+  RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_SOURCE_DIR}/bin/release)
+endforeach()
 
 
 
