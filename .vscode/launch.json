@@ -6,7 +6,7 @@
     "configurations": [
 
         {
-            "name": "C++: Current File",
+            "name": "C++ Windows: Current File",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/bin/debug/${fileBasenameNoExtension}",
@@ -17,6 +17,31 @@
             "externalConsole": true,
             "MIMode": "gdb",
             //"MIMode": "lldb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Set Disassembly Flavor to Intel",
+                    "text": "-gdb-set disassembly-flavor intel",
+                    "ignoreFailures": true
+                }
+            ],
+         //   "miDebuggerPath": "/usr/bin/gdb"
+        },
+        {
+            "name": "C++ MAC: Current File",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/bin/debug/${fileBasenameNoExtension}",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/bin/debug",
+            "environment": [],
+            "externalConsole": true,
+            "MIMode": "lldb",
             "setupCommands": [
                 {
                     "description": "Enable pretty-printing for gdb",
