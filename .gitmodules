@@ -6,4 +6,4 @@
 	url = https://github.com/chriskohlhoff/asio/
 [submodule "jsoncpp"]
 	path = jsoncpp
-	url = https://github.com/open-source-parsers/jsoncpp
+	url = https://github.com/open-source-parsers/jsoncpp/
