@@ -10,6 +10,8 @@
 
 #include "json/json.h"
 
+typedef websocketpp::server<websocketpp::config::asio> server;
+
 namespace Payload
 {
     class wsJson
@@ -54,24 +56,24 @@ public:
       , m_server("N/A")
     {}
 
-    void on_open(client * c, websocketpp::connection_hdl hdl) {
+    void on_open(server * c, websocketpp::connection_hdl hdl) {
         m_status = "Open";
 
-        client::connection_ptr con = c->get_con_from_hdl(hdl);
+        server::connection_ptr con = c->get_con_from_hdl(hdl);
         m_server = con->get_response_header("Server");
     }
 
-    void on_fail(client * c, websocketpp::connection_hdl hdl) {
+    void on_fail(server * c, websocketpp::connection_hdl hdl) {
         m_status = "Failed";
 
-        client::connection_ptr con = c->get_con_from_hdl(hdl);
+        server::connection_ptr con = c->get_con_from_hdl(hdl);
         m_server = con->get_response_header("Server");
         m_error_reason = con->get_ec().message();
     }
     
-    void on_close(client * c, websocketpp::connection_hdl hdl) {
+    void on_close(server * c, websocketpp::connection_hdl hdl) {
         m_status = "Closed";
-        client::connection_ptr con = c->get_con_from_hdl(hdl);
+        server::connection_ptr con = c->get_con_from_hdl(hdl);
         std::stringstream s;
         s << "close code: " << con->get_remote_close_code() << " (" 
           << websocketpp::close::status::get_string(con->get_remote_close_code()) 
@@ -79,7 +81,7 @@ public:
         m_error_reason = s.str();
     }
 
-    void on_message(websocketpp::connection_hdl hdl, client::message_ptr msg) {
+    void on_message(websocketpp::connection_hdl hdl, server::message_ptr msg) {
          std::cout << "on_message called with hdl: " << hdl.lock().get()
               << " and message: " << msg->get_payload()
               << std::endl;
@@ -117,7 +119,9 @@ private:
     std::vector<std::string> m_messages;
 };
 
-typedef websocketpp::server<websocketpp::config::asio> server;
+
+// Can we bypass the connection metadata and not worry about storing the handle/index 
+// When we return the onMessage we can send the handle <handle, message> if the user needs to respond
 
 template<class T>
 class wsJsonServer {
@@ -127,19 +131,21 @@ public:
 
 private:
     server m_endpoint;
-
+    int m_next_id;
  //   typedef struct {
  //      websocketpp::connection_hdl handlePtr;
  //      T message; 
  //   } HandleMetadata;
+    typedef std::map<int,connection_metadata::ptr> con_list;
+    con_list m_connection_list;
 
-    std::map<std::owner_less<websocketpp::connection_hdl>, HandleId> m_connections;
     std::map<HandleId, T> m_messages;
 
 public:
     wsJsonServer():
     m_endpoint(),
-    m_connections(),
+    m_next_id(0),
+    m_connection_list(),
     m_messages()
     {
          // Set logging settings
@@ -148,7 +154,7 @@ public:
 
         // Initialize Asio
         m_endpoint.init_asio();
-
+//TODO think out callbacks
         // Set the default message handler to the echo handler
         m_endpoint.set_message_handler(std::bind(&wsJsonServer::onMessage, this, std::placeholders::_1, std::placeholders::_2));
         m_endpoint.set_open_handler(std::bind(&wsJsonServer::onOpen, this,std::placeholders::_1));
@@ -160,46 +166,41 @@ public:
         std::cout << "onMessage hdl: " << hdl.lock().get()<< " message: " << msg->get_payload() << " opcode: " << msg->get_opcode()
               << std::endl;
     }
-        // Move up layer
-//        
-//        Json::Value root;
-//        JSONCPP_STRING err;
  
-//        Json::CharReaderBuilder builder;
-//        const std::unique_ptr<Json::CharReader> reader(builder.newCharReader());
-//        if (!reader->parse( msg->get_payload().c_str(),  msg->get_payload().c_str() + msg->get_payload().length(), &root,&err)) {
-//            std::cout << "JSON decoding error: " << msg->get_payload() << std::endl << err << std::endl;
-//        }
-//        else {  
-//            const std::string msg = root["Message"].asString();
-//            std::cout << "JSON Payload[message]" << msg << std::endl;
-//        }
-//    }
-
     void onClose(websocketpp::connection_hdl hdl) {
-        std::cout << "onClose called with hdl: " << hdl.lock().get()<< std::endl;
-        if (auto c = m_connections.find(hdl); c != m_connections.end()){
-            m_connections.erase(c);
-        }
+       std::cout << "onClose called with hdl: " << hdl.lock().get()<< std::endl;
+ //       if (auto c = m_connection_list.find(hdl); c != m_connection_list.end()){
+ //           m_connection_list.erase(c);
+ //       }
     }
 
     void onFail(websocketpp::connection_hdl hdl) {
         std::cout << "onFail called with hdl: " << hdl.lock().get()<< std::endl;
-        if (auto c = m_connections.find(hdl); c != m_connections.end()){
-            m_connections.erase(c);
-        }
+ //       if (auto c = m_connection_list.find(hdl); c != m_connection_list.end()){
+ //           m_connection_list.erase(c);
+ //       }
     }
     
     void onOpen(websocketpp::connection_hdl hdl) {
         std::cout << "onOpen called with hdl: " << hdl.lock().get()<< std::endl;
-        if (hdl.lock().get()){      // Ensure pointer is valid
-            std::owner_less<websocketpp::connection_hdl> a = hdl;
-            if (auto c = m_connections.find(hdl); c == m_connections.end()){
-                m_connections[hdl] = handleIndex++;
-            }
-            else{
-                std::cout << "onOpen called with existing handle hdl" <<std::endl;
-            }
+        if(hdl.lock()){
+            // pointer not valid
+        }
+        if (auto d = hdl.lock()){      // Ensure pointer is valid
+           // d->
+            int new_id = m_next_id++;
+            // TODO: uri
+            connection_metadata::ptr metadata_ptr = websocketpp::lib::make_shared<connection_metadata>(new_id, hdl, "");
+            m_connection_list[new_id] = metadata_ptr;
+            hdl.
+
+//            std::owner_less<websocketpp::connection_hdl> a = hdl;
+//            if (auto c = m_connection_list.find(hdl); c == m_connection_list.end()){
+//                m_connection_list[hdl] = handleIndex++;
+//            }
+//            else{
+//                std::cout << "onOpen called with existing handle hdl" <<std::endl;
+//            }
         }
     }
 
