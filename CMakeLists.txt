@@ -55,6 +55,7 @@ set(BUILD_SHARED_LIBS OFF)
 set(BUILD_STATIC_LIBS ON)
 set(BUILD_OBJECT_LIBS OFF)
 
+add_compile_definitions(LOGGER_USE_STUB )
 add_subdirectory(jsoncpp)
 
 foreach(s
@@ -64,6 +65,7 @@ foreach(s
     wsJsonClient
     wsJsonServer
     wsEndpointTest
+    wsEndpointClassTest
     )
   add_executable(${s} ${s}.cpp)
   set_property(TARGET ${s} PROPERTY CXX_STANDARD 17)
