@@ -8,6 +8,7 @@ https://github.com/zaphoyd/websocketpp/
 git submodule add https://github.com/zaphoyd/websocketpp/
 git submodule add https://github.com/chriskohlhoff/asio/
 git submodule add https://github.com/open-source-parsers/jsoncpp
+git submodule add https://github.com/apache/logging-log4cxx
 
 -- To populate submodules
 
