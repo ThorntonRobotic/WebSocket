@@ -1,3 +1,5 @@
+#pragma once 
+
 #define ASIO_STANDALONE
 //#define ASIO_WINDOWS
 #define _WEBSOCKETPP_CPP11_THREAD_
@@ -14,7 +16,6 @@ typedef websocketpp::server<websocketpp::config::asio> server;
 
 namespace wsEndpoint
 {
-
     // pull out the type of messages sent by our config
     typedef server::message_ptr message_ptr;
 
@@ -23,7 +24,7 @@ namespace wsEndpoint
     template<class T>
     class Server {
     public:
-        typedef  void (*messageCallback)(server* , websocketpp::connection_hdl, typename T::valueType &);
+        typedef  void (*messageCallback)(Server* , websocketpp::connection_hdl, typename T::valueType &);
 
     private:
         int port_;
@@ -71,7 +72,7 @@ namespace wsEndpoint
                 if ( payload_.decode(msg->get_payload())){
                     auto v = payload_.getValue();
                     std::cout << "decoded: " << v << std::endl; 
-                    messageCallback_(&endpoint_, hdl, v) ;
+                    messageCallback_(this, hdl, v) ;
                 }
                 else{
                     std::cout << "decode error in payload" << std::endl;  
@@ -106,7 +107,7 @@ namespace wsEndpoint
             }
         }
 
-        void send(websocketpp::connection_hdl & hdl, std::string message) {
+        void send(websocketpp::connection_hdl & hdl, std::string & message) {
             websocketpp::lib::error_code ec;
             // TODO : try
             std::string encoded = payload_.encode(message);
@@ -114,6 +115,12 @@ namespace wsEndpoint
             if (ec) {
               std::cout << "> Error sending message: " << ec.message() << std::endl;
           }
+        }
+
+        void send(websocketpp::connection_hdl & hdl,  typename T::valueType &message) {
+            std::cout << "send: " << message << std::endl; 
+            std::string serialized = payload_.serialize(message);
+            send(hdl, serialized);
         }
 
         void run() {
@@ -127,22 +134,3 @@ namespace wsEndpoint
         }
     };
 };
-
-
-// Define a callback to handle incoming messages
-void on_message (server* s, websocketpp::connection_hdl hdl, wsPayload::JsonPayload::valueType & p) {
-    std::cout << "decoded: " << p << std::endl; 
-//    try {
-//        s->send(hdl, msg->get_payload(), msg->get_opcode());
-//    } catch (websocketpp::exception const & e) {
-//        std::cout << "Echo failed because: "
-//                  << "(" << e.what() << ")" << std::endl;
-//    }
-}
-
-int main() {
-    wsEndpoint::Server<wsPayload::JsonPayload> s(9002);
-    s.setMessageCallback(&on_message);
-    s.run();
-    return 0;
-}

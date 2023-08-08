@@ -28,19 +28,26 @@ namespace wsPayload
 
         bool decode(const std::string &data){
             Json::CharReaderBuilder builder;
+            builder.settings_["indentation"] = "";
             const std::unique_ptr<Json::CharReader> reader(builder.newCharReader());
             return reader->parse( data.c_str(),  data.c_str() + data.length(), &base, &err);
         }
 
-        valueType getValue()
-        {
+        valueType getValue(){
             return base;
         }
-        
-        std::string encode(const std::string &data){
-            Json::Value root;
+
+        // Convert data type to a string
+        std::string serialize(valueType &data){
             Json::StreamWriterBuilder builder;
-            root["Payload"] = data;
+            builder.settings_["indentation"] = "";
+            return Json::writeString(builder, data);
+        }
+
+        std::string encode(const std::string &data){
+            Json::Value root(data);
+            Json::StreamWriterBuilder builder;
+            //root["Payload"] = data;
             const std::string encoded = Json::writeString(builder, root);
             std::cout << "Sending:" << encoded << std::endl;
             return encoded;
