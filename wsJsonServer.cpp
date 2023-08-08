@@ -123,6 +123,9 @@ private:
 // Can we bypass the connection metadata and not worry about storing the handle/index 
 // When we return the onMessage we can send the handle <handle, message> if the user needs to respond
 
+// pull out the type of messages sent by our config
+typedef server::message_ptr message_ptr;
+
 template<class T>
 class wsJsonServer {
 public:
@@ -155,11 +158,19 @@ public:
         // Initialize Asio
         m_endpoint.init_asio();
 //TODO think out callbacks
+// Limit number of connections
+// Base class for payload interactions (send/onMessage) use for client and server encode/decoder
+
         // Set the default message handler to the echo handler
         m_endpoint.set_message_handler(std::bind(&wsJsonServer::onMessage, this, std::placeholders::_1, std::placeholders::_2));
         m_endpoint.set_open_handler(std::bind(&wsJsonServer::onOpen, this,std::placeholders::_1));
         m_endpoint.set_fail_handler(std::bind(&wsJsonServer::onFail, this, websocketpp::lib::placeholders::_1));
         m_endpoint.set_close_handler(std::bind(&wsJsonServer::onClose, this, websocketpp::lib::placeholders::_1));
+    }
+
+    void setMessageHandler( void (*g)(server* s, websocketpp::connection_hdl hdl, message_ptr msg)) {
+        auto h = websocketpp::lib::bind(g, &m_endpoint,websocketpp::lib::placeholders::_1,websocketpp::lib::placeholders::_2);
+        m_endpoint.set_message_handler(h);
     }
 
     void onMessage(websocketpp::connection_hdl hdl, server::message_ptr msg) {
@@ -188,11 +199,12 @@ public:
         }
         if (auto d = hdl.lock()){      // Ensure pointer is valid
            // d->
+           auto e = d.get();
+           std::cout << "onOpen called with hdl: " << e<< std::endl;
             int new_id = m_next_id++;
             // TODO: uri
             connection_metadata::ptr metadata_ptr = websocketpp::lib::make_shared<connection_metadata>(new_id, hdl, "");
             m_connection_list[new_id] = metadata_ptr;
-            hdl.
 
 //            std::owner_less<websocketpp::connection_hdl> a = hdl;
 //            if (auto c = m_connection_list.find(hdl); c == m_connection_list.end()){
@@ -244,10 +256,36 @@ public:
     }
 };
 
+
+// Define a callback to handle incoming messages
+void on_message (server* s, websocketpp::connection_hdl hdl, message_ptr msg) {
+    std::cout << "on_message called with hdl: " << hdl.lock().get()
+              << " and message: " << msg->get_payload()
+              << std::endl;
+
+    // check for a special command to instruct the server to stop listening so
+    // it can be cleanly exited.
+    if (msg->get_payload() == "stop-listening") {
+        s->stop_listening();
+        return;
+    }
+
+    try {
+        s->send(hdl, msg->get_payload(), msg->get_opcode());
+    } catch (websocketpp::exception const & e) {
+        std::cout << "Echo failed because: "
+                  << "(" << e.what() << ")" << std::endl;
+    }
+}
+
 wsJsonServer<Payload::wsJson>::HandleId handleIndex = 0;
 
 int main() {
     wsJsonServer<Payload::wsJson> s;
+    void (*g)(server* s, websocketpp::connection_hdl hdl, message_ptr msg);
+
+ //   auto h = websocketpp::lib::bind(&on_message,&s,websocketpp::lib::placeholders::_1,websocketpp::lib::placeholders::_2);
+    s.setMessageHandler(&on_message);
     s.run();
     return 0;
 }
