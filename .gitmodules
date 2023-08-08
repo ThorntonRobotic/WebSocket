@@ -7,3 +7,6 @@
 [submodule "jsoncpp"]
 	path = jsoncpp
 	url = https://github.com/open-source-parsers/jsoncpp/
+[submodule "logging-log4cxx"]
+	path = logging-log4cxx
+	url = https://github.com/apache/logging-log4cxx
