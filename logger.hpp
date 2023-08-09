@@ -33,14 +33,21 @@
 
 #ifdef LOGGER_USE_STUB
 class LoggerStub {
+private:
+    bool debug_;
+    bool error_;
+    bool fatal_;
+    bool warn_;
+    bool info_;
+
 public:
-    LoggerStub() = default;
+    LoggerStub(): debug_(false), error_(true), fatal_(true), warn_(true), info_(true){};
     ~LoggerStub() = default;
-    void debug(std::string  s){ std::cout << s << std::endl;};
-    void error(std::string  s){ std::cout << s << std::endl;};
-    void fatal(std::string  s){ std::cout << s << std::endl;};
-    void warn(std::string  s){ std::cout << s << std::endl;};
-    void info(std::string  s){ std::cout << s << std::endl;};
+    void debug(std::string  s){ if(debug_) std::cout << s << std::endl;};
+    void error(std::string  s){ if(error_) std::cout << s << std::endl;};
+    void fatal(std::string  s){ if(fatal_) std::cout << s << std::endl;};
+    void warn(std::string  s){ if(warn_) std::cout << s << std::endl;};
+    void info(std::string  s){ if(info_) std::cout << s << std::endl;};
 };
 #else
 #include <log4cxx/logger.h>

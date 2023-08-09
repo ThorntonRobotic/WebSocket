@@ -49,7 +49,7 @@ namespace wsPayload
             Json::StreamWriterBuilder builder;
             //root["Payload"] = data;
             const std::string encoded = Json::writeString(builder, root);
-            std::cout << "Sending:" << encoded << std::endl;
+            // std::cout << "Sending:" << encoded << std::endl;
             return encoded;
         }
     };
