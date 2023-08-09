@@ -8,7 +8,6 @@
 #include <websocketpp/server.hpp>
 
 #include <functional>
-#include <map>
 
 #include "logger.hpp"
 #include "wsPayload.hpp"
@@ -65,6 +64,11 @@ namespace wsServer
             endpoint_.set_close_handler(std::bind(&Endpoint::onClose, this, websocketpp::lib::placeholders::_1));
         }
 
+        ~Endpoint(){
+                // Shutdown
+            endpoint_.stop();
+        }
+
         // Allow application callbacks
         void setMessageCallback( messageCallback cb) {
             messageCallback_ = cb;
@@ -90,7 +94,7 @@ namespace wsServer
 
         void onMessage(websocketpp::connection_hdl hdl, server::message_ptr msg) {
              if (hdl.lock()){      // Ensure pointer is valid
-                 log_.debug("onMessage : %s opcode: %x\n", msg->get_payload().c_str(), msg->get_opcode());
+                 log_.debug("onMessage : %s opcode: %x", msg->get_payload().c_str(), msg->get_opcode());
             
                 if ( payload_.decode(msg->get_payload())){
                     auto v = payload_.getValue();
@@ -148,7 +152,7 @@ namespace wsServer
             }
         }
 
-        void send(websocketpp::connection_hdl & hdl, std::string & message) {
+        void send(websocketpp::connection_hdl & hdl, std::string message) {
             websocketpp::lib::error_code ec;
             if (hdl.lock()){
                 log_.debug("send : called with hdl: %x", hdl); 

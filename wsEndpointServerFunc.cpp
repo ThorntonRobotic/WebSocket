@@ -1,4 +1,4 @@
-#include "wsEndpoint.hpp"
+#include "wsServerEndpoint.hpp"
 #include "logger.hpp"
 
 // Test program for endpoint server using functions as the callback agent

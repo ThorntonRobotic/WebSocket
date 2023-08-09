@@ -64,8 +64,9 @@ foreach(s
     wsClientClass
     wsJsonClient
     wsJsonServer
-    wsEndpointTest
-    wsEndpointClassTest
+    wsEndpointServerFunc
+    wsEndpointServerClass
+    wsEndpointClientFunc
     )
   add_executable(${s} ${s}.cpp)
   set_property(TARGET ${s} PROPERTY CXX_STANDARD 17)
