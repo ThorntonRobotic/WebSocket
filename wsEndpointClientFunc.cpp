@@ -29,7 +29,7 @@ int main() {
 
     wsClient::Endpoint<wsPayload::JsonPayload>::messageCallback msgCb = std::bind(on_message, _1, _2, _3);
     wsClient::Endpoint<wsPayload::JsonPayload>::openCallback openCb = std::bind(on_open, _1, _2);
-    wsClient::Endpoint<wsPayload::JsonPayload> s("ws://127.0.0.1:9002", log_);    
+    wsClient::Endpoint<wsPayload::JsonPayload> s("ws://192.168.86.33:9002", log_);    // X2 
     s.setMessageCallback(msgCb);
     s.setOpenCallback(openCb);
     s.connect();
@@ -46,7 +46,7 @@ int main() {
         usleep(1000);
         sprintf(f, "{\"Message\":\"Client test s(%d)\"}", ++count);
         s.send(std::string(f));
-        t.send("{\"Message\":\"Client test t\"}");
+   //     t.send("{\"Message\":\"Client test t\"}");
     }
     return 0;
 }

@@ -52,6 +52,7 @@ namespace wsPayload
             // std::cout << "Sending:" << encoded << std::endl;
             return encoded;
         }
+
     };
 };
 
