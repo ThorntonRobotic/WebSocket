@@ -1,6 +1,6 @@
 #pragma once 
 
-#define ASIO_STANDALONE
+//#define ASIO_STANDALONE
 //#define ASIO_WINDOWS
 #define _WEBSOCKETPP_CPP11_THREAD_
 

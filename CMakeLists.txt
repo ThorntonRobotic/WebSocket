@@ -1,8 +1,6 @@
-#https://code.visualstudio.com/docs/cpp/CMake-linux
-# apt-get install cmake
-# TODO
-# Is there a better way to handle include files, should we copy to build ?
-# Build python bindings examples, see where they get installed
+#For Linux build we must build the libjsoncpp.a library first
+# Go to cmake panel and build target for src/lib_json
+# Then you can do full make 
 
 macro(global_config)
   set(CMAKE_VERBOSE_MAKEFILE ON)
@@ -17,20 +15,22 @@ macro(global_config)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -g -Wall -std=c++17 -fPIC")
   endif()
 
-  # Ugly but ok for now
-  link_directories(${CMAKE_SOURCE_DIR}/build/jsoncpp/src/lib_json)
+  
 
  # find_package(CUDA QUIET REQUIRED)
  # include_directories(${CUDA_INCLUDE_DIRS})
   #
   #link_directories(${CMAKE_SOURCE_DIR}/../WebRTC_R32.7.3)
   # MAC set(GLOBAL_LIBRARIES  ${CUDA_LIBRARIES}  dl pthread)
-  if (WIN32)
-    set(GLOBAL_LIBRARIES pthread ws2_32 mswsock jsoncpp)
-  else()
-    set(GLOBAL_LIBRARIES  pthread dl jsoncpp)
-  endif (WIN32)
   
+  if (WIN32)
+  # Ugly but ok for now
+    link_directories(${CMAKE_SOURCE_DIR}/build/jsoncpp/src/lib_json) 
+    set(GLOBAL_LIBRARIES pthread ws2_32 mswsock jsoncpp)
+    add_compile_definitions(ASIO_STANDALONE)
+  else()
+    set(GLOBAL_LIBRARIES  pthread dl ${CMAKE_SOURCE_DIR}/build/jsoncpp/src/lib_json/libjsoncpp.a)
+  endif (WIN32)
 
 endmacro()
 
@@ -43,12 +43,13 @@ set(TARGET WebSocket)
 
 global_config()
 
-include_directories(${PROJECT_NAME}
+ include_directories(${PROJECT_NAME}
   #../WebRTC_R32.7.3/webrtc_headers
   ./asio/asio/include
   ./websocketpp
   ./jsoncpp/include
-)
+  )   
+
 
 set(JSONCPP_WITH_TESTS  OFF)
 set(BUILD_SHARED_LIBS OFF)

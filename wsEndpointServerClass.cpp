@@ -63,9 +63,9 @@ int main() {
     */
 
     DummyAgent dummy;
-    s.setMessageCallback(std::bind(DummyAgent::on_message, &dummy, _1, _2, _3));
-    s.setOpenCallback(std::bind(DummyAgent::on_open, &dummy, _1, _2));
-    s.setCloseCallback(std::bind(DummyAgent::on_close, &dummy, _1, _2));
+    s.setMessageCallback(std::bind(&DummyAgent::on_message, &dummy, _1, _2, _3));
+    s.setOpenCallback(std::bind(&DummyAgent::on_open, &dummy, _1, _2));
+    s.setCloseCallback(std::bind(&DummyAgent::on_close, &dummy, _1, _2));
     s.run();
     
     return 0;

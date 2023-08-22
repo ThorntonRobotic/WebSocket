@@ -83,7 +83,12 @@ int main() {
             bool liveMode = true;
 
             while(liveMode) {
+#ifdef _WIN32
                 auto c = getch();
+#else           
+                auto c = getchar();
+#endif
+
 
                 switch (c){
                     case 'a':
