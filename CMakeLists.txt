@@ -22,14 +22,31 @@ macro(global_config)
   #
   #link_directories(${CMAKE_SOURCE_DIR}/../WebRTC_R32.7.3)
   # MAC set(GLOBAL_LIBRARIES  ${CUDA_LIBRARIES}  dl pthread)
-  
+
+
   if (WIN32)
-  # Ugly but ok for now
-    link_directories(${CMAKE_SOURCE_DIR}/build/jsoncpp/src/lib_json) 
-    set(GLOBAL_LIBRARIES pthread ws2_32 mswsock jsoncpp)
-    add_compile_definitions(ASIO_STANDALONE)
+    set(GLOBAL_LIBRARIES pthread ws2_32 mswsock)
+
+    include_directories(${PROJECT_NAME}
+    #../WebRTC_R32.7.3/webrtc_headers
+    ./asio/asio/include
+    ./websocketpp
+    ./jsoncpp/include
+    ./srt/srtcore
+    ./build/srt
+    ./srt/common
+    )   
   else()
-    set(GLOBAL_LIBRARIES  pthread dl ${CMAKE_SOURCE_DIR}/build/jsoncpp/src/lib_json/libjsoncpp.a)
+    set(GLOBAL_LIBRARIES  pthread dl)
+
+    include_directories(${PROJECT_NAME}
+    #../WebRTC_R32.7.3/webrtc_headers
+    ./asio/asio/include
+    ./websocketpp
+    ./jsoncpp/include
+    ./srt/srtcore
+    ./build/srt
+    )   
   endif (WIN32)
 
 endmacro()
@@ -43,16 +60,6 @@ set(TARGET WebSocket)
 
 global_config()
 
- include_directories(${PROJECT_NAME}
-  #../WebRTC_R32.7.3/webrtc_headers
-  ./asio/asio/include
-  ./websocketpp
-  ./jsoncpp/include
-  ./srt/srtcore
-  ./build/srt
-  )   
-
-
 set(JSONCPP_WITH_TESTS  OFF)
 set(BUILD_SHARED_LIBS OFF)
 set(BUILD_STATIC_LIBS ON)
@@ -61,6 +68,11 @@ set(BUILD_OBJECT_LIBS OFF)
 add_compile_definitions(LOGGER_USE_STUB )
 add_subdirectory(jsoncpp)
 
+  # SRT definitions
+set (USE_CXX_STD 17)
+#set (ENABLE_APPS OFF)
+add_compile_definitions(ASIO_STANDALONE)
+add_compile_definitions(_WEBSOCKETPP_CPP11_THREAD_)  
 add_subdirectory(srt)
 
 foreach(s

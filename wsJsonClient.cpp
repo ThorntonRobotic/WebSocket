@@ -1,6 +1,6 @@
-#define ASIO_STANDALONE
+//#define ASIO_STANDALONE
 //#define ASIO_WINDOWS
-#define _WEBSOCKETPP_CPP11_THREAD_
+//#define _WEBSOCKETPP_CPP11_THREAD_
 
 #include <websocketpp/config/asio_no_tls_client.hpp>
 #include <websocketpp/client.hpp>

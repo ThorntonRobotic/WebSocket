@@ -3,9 +3,9 @@
 #include <iostream>
 
 //#include <modules/video_coding/codecs/nvidia/NvVideoEncoderFactory.h>
-#define ASIO_STANDALONE
+//#define ASIO_STANDALONE
 //#define ASIO_WINDOWS
-#define _WEBSOCKETPP_CPP11_THREAD_
+//#define _WEBSOCKETPP_CPP11_THREAD_
 
 #include <websocketpp/config/asio_no_tls.hpp>
 #include <websocketpp/server.hpp>
