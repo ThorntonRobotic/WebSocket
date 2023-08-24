@@ -72,7 +72,7 @@ foreach(s
     )
   add_executable(${s} ${s}.cpp)
   set_property(TARGET ${s} PROPERTY CXX_STANDARD 17)
-  target_link_libraries(${s} ${GLOBAL_LIBRARIES})
+  target_link_libraries(${s} ${GLOBAL_LIBRARIES} jsoncpp_static)
   set_target_properties(${s} PROPERTIES
   RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_SOURCE_DIR}/bin/debug
   RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_SOURCE_DIR}/bin/release)
