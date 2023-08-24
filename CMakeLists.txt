@@ -48,6 +48,8 @@ global_config()
   ./asio/asio/include
   ./websocketpp
   ./jsoncpp/include
+  ./srt/srtcore
+  ./build/srt
   )   
 
 
@@ -59,6 +61,8 @@ set(BUILD_OBJECT_LIBS OFF)
 add_compile_definitions(LOGGER_USE_STUB )
 add_subdirectory(jsoncpp)
 
+add_subdirectory(srt)
+
 foreach(s
     wsServerCallback
     wsServerClass
@@ -69,10 +73,11 @@ foreach(s
     wsEndpointServerClass
     wsEndpointClientFunc
     wsLoparControl
+    wsLoparClient
     )
   add_executable(${s} ${s}.cpp)
   set_property(TARGET ${s} PROPERTY CXX_STANDARD 17)
-  target_link_libraries(${s} ${GLOBAL_LIBRARIES} jsoncpp_static)
+  target_link_libraries(${s} ${GLOBAL_LIBRARIES} jsoncpp_static srt_static)
   set_target_properties(${s} PROPERTIES
   RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_SOURCE_DIR}/bin/debug
   RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_SOURCE_DIR}/bin/release)

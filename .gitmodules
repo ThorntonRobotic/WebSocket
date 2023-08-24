@@ -10,3 +10,6 @@
 [submodule "logging-log4cxx"]
 	path = logging-log4cxx
 	url = https://github.com/apache/logging-log4cxx
+[submodule "srt"]
+	path = srt
+	url = https://github.com/Haivision/srt.git
