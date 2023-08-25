@@ -134,14 +134,14 @@ namespace wsClient
     
         void onClose(websocketpp::connection_hdl hdl) {
             if (hdl.lock()){
-                log_.debug("onClose : called with hdl: %x", hdl);
+                log_.debug("onClose : called with hdl: %x", &hdl);
                 status_ = "Idle";
             }
         }
 
         void onFail(websocketpp::connection_hdl hdl) {
             if (hdl.lock()){
-                log_.debug("onFail : called with hdl: %x", hdl); 
+                log_.debug("onFail : called with hdl: %x", &hdl); 
                 status_ = "Fail"; 
                 client::connection_ptr con = endpoint_.get_con_from_hdl(hdl);
                 errorReason_ = con->get_ec().message();
@@ -151,7 +151,7 @@ namespace wsClient
         
         void onOpen(websocketpp::connection_hdl hdl) {
             if (hdl.lock()){
-                log_.debug("onOpen : called with hdl: %x", hdl); 
+                log_.debug("onOpen : called with hdl: %x", &hdl); 
                 status_ = "Open";
                 client::connection_ptr con = endpoint_.get_con_from_hdl(hdl);
                 errorReason_ = con->get_ec().message();
@@ -187,14 +187,14 @@ namespace wsClient
         void close(websocketpp::close::status::value code, std::string reason) {
             websocketpp::lib::error_code ec;
             if (hdl_.lock()){
-                log_.debug("close : called with hdl: %x", hdl_); 
+                log_.debug("close : called with hdl: %x", &hdl_); 
                 endpoint_.close(hdl_, code, reason, ec);
                 if (ec) {
-                    log_.error("> Error initiating close: %s", ec.message());
+                    log_.error("> Error initiating close: %s", ec.message().c_str());
                 }
             }
             else{
-               log_.error("close : called fail, unable to lock hdl: %x\n ", hdl_);  
+               log_.error("close : called fail, unable to lock hdl: %x\n ", &hdl_);  
             }
         }
 
@@ -204,11 +204,11 @@ namespace wsClient
                 std::string encoded = payload_.encode(message);
                 endpoint_.send(hdl_, message, websocketpp::frame::opcode::text, ec);
                 if (ec) {
-                    log_.error("> Error sending message: %s", ec.message());
+                    log_.error("> Error sending message: %s", ec.message().c_str());
                 }
             }        
             else{
-               log_.error("send : message fail, unable to lock hdl: %x", hdl_);  
+               log_.error("send : message fail, unable to lock hdl: %x", &hdl_);  
             }
         }
 

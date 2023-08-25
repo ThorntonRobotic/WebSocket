@@ -70,6 +70,11 @@ add_subdirectory(jsoncpp)
 
   # SRT definitions
 set (USE_CXX_STD 17)
+
+if (APPLE)
+set (ENABLE_ENCRYPTION OFF)
+endif()
+
 #set (ENABLE_APPS OFF)
 add_compile_definitions(ASIO_STANDALONE)
 add_compile_definitions(_WEBSOCKETPP_CPP11_THREAD_)  
