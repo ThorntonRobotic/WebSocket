@@ -41,7 +41,7 @@ private:
     bool info_;
 
 public:
-    LoggerStub(): debug_(false), error_(true), fatal_(true), warn_(true), info_(true){};
+    LoggerStub(): debug_(true), error_(true), fatal_(true), warn_(true), info_(true){};
     ~LoggerStub() = default;
     void debug(std::string  s){ if(debug_) std::cout << s << std::endl;};
     void error(std::string  s){ if(error_) std::cout << s << std::endl;};
