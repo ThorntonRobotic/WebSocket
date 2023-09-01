@@ -92,6 +92,7 @@ foreach(s
     wsLoparControl
     wsLoparClient
     wsLoparServer
+    srtAccessControl
     )
   add_executable(${s} ${s}.cpp)
   set_property(TARGET ${s} PROPERTY CXX_STANDARD 17)

@@ -9,7 +9,6 @@
 #include <unistd.h>
 #endif
 
-#include <srt.h>
 
 // Test program for endpoint server using functions as the callback agent
 
@@ -49,9 +48,6 @@ int main() {
     ws.setMessageCallback(msgCb);
     ws.setOpenCallback(openCb);
     ws.connect();
-
-    // Initialize the SRT library.
-   srt_startup();
 
     bool done=false;
     std::string input;
